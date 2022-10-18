@@ -50,7 +50,7 @@
             margin-right: 20px;
             border: 1px dashed #d9d9d9;
             border-radius: 6px;
-            margin: 300px auto;
+            margin: 100px auto;
             background-color: #ccc;
         }
 
@@ -147,8 +147,9 @@
 
     <img id="source" alt="">
     <div>
-        行<input id="inp1" type="text" value="2">
-        列<input id="inp2" type="text" value="2">
+        行<input id="inp1" type="text" value="1">
+        列<input id="inp2" type="text" value="20">
+        索引<input id="inp3" type="text" value="666">
         <button id="clip_image">开拆</button>
         <button id="download_image">全部下载</button>
     </div>
@@ -215,6 +216,7 @@
 
             row = (document.getElementById('inp1').value);
             column = (document.getElementById('inp2').value);
+            index = (document.getElementById('inp3').value);
 
             const image = document.getElementById('source'); // 被修改！！！！！！！！
 
@@ -277,9 +279,19 @@
         }
         //  下载函数
         function downLoad(url, i) {
+
+            // 核心逻辑
+            let the1 = i / 2;
+            let the2 = (i + 1) % 2 ? 1 : 2;
+
+            let tmp_file = String.fromCharCode(65 + the1) + '_' + index + '_' + the2.toString();
+
             console.log(i);
             const oA = document.createElement("a");
-            oA.download = i + "_933_A";// 设置下载的文件名，默认是'下载'
+
+            // oA.download = i.toString() + index.toString();// 设置下载的文件名，默认是'下载'
+            oA.download = tmp_file;
+
             oA.href = url;
             document.body.appendChild(oA);
             oA.click();
