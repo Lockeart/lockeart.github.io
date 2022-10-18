@@ -1,1 +1,292 @@
-<!doctype html><html lang=""><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no"><link rel="icon" href="/lockeart-logo2.svg"><title>Lockeart Palette | 图片聚合、灵感收集必备工具</title><script defer="defer" src="/js/chunk-vendors.d7474126.js"></script><script defer="defer" src="/js/app.3fa9037d.js"></script><link href="/css/chunk-vendors.882ade30.css" rel="stylesheet"><link href="/css/app.19c5f744.css" rel="stylesheet"></head><body style="padding-top: 0;background: #fef6e4;padding-bottom: 0px;"><noscript><strong>We're sorry but lockeart-ui-01 doesn't work properly without JavaScript enabled. Please enable it to continue.</strong></noscript><div id="app"></div></body></html>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        /* modal 样式 */
+        #modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 0;
+            height: 0;
+            box-shadow: 0 0 10px #d9d9d9;
+            background: rgba(0, 0, 0, .3);
+            /* transition: all .1s ease-in-out; */
+            overflow: hidden;
+        }
+
+        #modal .content {
+            box-sizing: border-box;
+            width: 100%;
+            height: 100%;
+            padding: 45px 20px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        #modal #modalImg {
+            height: 100%;
+        }
+
+        #modal #closeIcon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+
+
+        .card {
+            position: relative;
+            width: 200px;
+            height: 140px;
+            padding: 5px;
+            margin-right: 20px;
+            border: 1px dashed #d9d9d9;
+            border-radius: 6px;
+            margin: 300px auto;
+            background-color: #ccc;
+        }
+
+        .card input {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .card .view {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card .view #icon {
+            display: inline-block;
+            font-size: 30px;
+        }
+
+        .card .view .img-container {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+        }
+
+        .img-container img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .img-container .img-mask {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            background: rgba(0, 0, 0, .3);
+            transition: all .5s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .img-container:hover .img-mask {
+            opacity: 1;
+        }
+
+        .img-mask span {
+            color: #fff;
+            margin: 0 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 预览图片的 modal 框 -->
+    <div id="modal">
+        <span id="closeIcon">关闭</span>
+        <div class="content">
+            <img id="modalImg">
+        </div>
+    </div>
+
+
+    <div class="card">
+        <input id="upload" type="file" accept=".png" />
+        <div class="view">
+            <!-- 上传成功后 -->
+            <div id="imgContainer" class="img-container">
+                <img id="img" />
+                <!-- 鼠标移入展示 查看 与 删除 操作 -->
+                <div class="img-mask">
+                    <span id="showImg">查看</span>
+                    <span id="delImg">删除</span>
+                </div>
+            </div>
+            <!-- 上传成功前 -->
+            <span id="icon">+</span>
+        </div>
+    </div>
+
+    <img id="source" alt="">
+    <div>
+        行<input id="inp1" type="text" value="2">
+        列<input id="inp2" type="text" value="2">
+        <button id="clip_image">开拆</button>
+        <button id="download_image">全部下载</button>
+    </div>
+    <div id="allCanvas"></div>
+    <div></div>
+
+
+
+    <script>
+
+        const upload = document.getElementById('upload');
+        const imgContainer = document.getElementById('imgContainer');
+        const img = document.getElementById('img');
+        const icon = document.getElementById('icon');
+
+        let imgUrl = '';
+        // 图片上传成功后创建 URL
+        upload.onchange = function (value) {
+            const fileList = value.target.files;
+            if (fileList.length) {
+                imgContainer.style.display = 'block';
+                icon.style.display = 'none';
+                imgUrl = window.URL.createObjectURL(fileList[0]);
+                img.src = imgUrl;
+            }
+        }
+
+        /* ...接以上代码 */
+        const showImg = document.getElementById('showImg');
+        const delImg = document.getElementById('delImg');
+        const modal = document.getElementById('modal');
+        const modalImg = document.getElementById('modalImg');
+        const closeIcon = document.getElementById('closeIcon');
+
+
+        // 关闭 modal 预览框
+        closeIcon.onclick = function () {
+            modal.style.width = '0';
+            modal.style.height = '0';
+            modalImg.src = '';
+        }
+
+        // 点击预览图片
+        showImg.onclick = function () {
+            modal.style.width = '100%';
+            modal.style.height = '100%';
+            modalImg.src = imgUrl;
+        }
+
+        // 删除上传的图片
+        delImg.onclick = function () {
+            upload.value = '';
+            imgUrl = '';
+            icon.style.display = 'block';
+            imgContainer.style.display = 'none';
+        }
+
+
+        let row = 2
+        let column = 3
+        //  拆分图片
+        document.getElementById("clip_image").onclick = function () {
+            clearImage()
+
+            row = (document.getElementById('inp1').value);
+            column = (document.getElementById('inp2').value);
+
+            const image = document.getElementById('source'); // 被修改！！！！！！！！
+
+            image.src = img.src
+
+            const width = image.width / column
+            const height = image.height / row
+            for (let i = 1; i <= row * column; i++) {
+                let canvasDom = document.createElement("canvas")
+                canvasDom.id = 'canvas' + i
+                canvasDom.width = width
+                canvasDom.height = height
+                canvasDom.style.marginRight = '5px'
+                canvasDom.onclick = func
+                document.getElementById('allCanvas').appendChild(canvasDom)
+                if (i % Number(column) === 0) {
+                    let brDom = document.createElement("br")
+                    document.getElementById('allCanvas').appendChild(brDom)
+                }
+                const canvas = document.getElementById('canvas' + i);
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(image, width * Math.floor((i - 1) % column), height * Math.floor((i - 1) / column), width, height, 0, 0, width, height);
+            }
+        }
+        // 全部下载
+        document.getElementById("download_image").onclick = function () {
+            let allCanvas = document.getElementsByTagName("canvas")
+            let canvas = null
+            console.log(allCanvas);
+            if (allCanvas.length !== 0) {
+                for (let i = 0; i < allCanvas.length; i++) {
+                    canvas = document.getElementById(allCanvas[i].id)
+                    downLoad(canvas.toDataURL("image/png"), i);
+                }
+            } else {
+                alert('没拆开的东西咋下载')
+            }
+        }
+        // 清除canvas节点
+        function clearImage() {
+            let allCanvas = document.getElementsByTagName("canvas")
+            let allBr = document.getElementsByTagName("br")
+            for (let i = allCanvas.length - 1; i >= 0; i--) {
+                (allCanvas[i]).remove()
+                if (i % column === 0) {
+                    (allBr[Math.floor(i / column)]).remove()
+                }
+            }
+            for (let i = allBr.length - 1; i >= 0; i--) {
+                (allBr[i]).remove()
+            }
+        }
+        // 单个图片下载
+        function func(data) {
+            let canvas = document.getElementById(data.target.id)
+            // base64编码
+            // console.log(canvas.toDataURL("image/png"));
+            // 设定图片格式
+            downLoad(canvas.toDataURL("image/png"));
+        }
+        //  下载函数
+        function downLoad(url, i) {
+            console.log(i);
+            const oA = document.createElement("a");
+            oA.download = i + "_933_A";// 设置下载的文件名，默认是'下载'
+            oA.href = url;
+            document.body.appendChild(oA);
+            oA.click();
+            oA.remove(); // 下载之后把创建的元素删除
+        }
+
+    </script>
+</body>
+
+</html>
