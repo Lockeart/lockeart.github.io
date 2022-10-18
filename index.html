@@ -129,7 +129,7 @@
 
 
     <div class="card">
-        <input id="upload" type="file" accept=".png" />
+        <input id="upload" type="file" accept="image/*" />
         <div class="view">
             <!-- 上传成功后 -->
             <div id="imgContainer" class="img-container">
@@ -150,6 +150,7 @@
         行<input id="inp1" type="text" value="1">
         列<input id="inp2" type="text" value="20">
         索引<input id="inp3" type="text" value="666">
+        图片格式<input id="inp4" type="text" value="image/jpeg">
         <button id="clip_image">开拆</button>
         <button id="download_image">全部下载</button>
     </div>
@@ -217,6 +218,7 @@
             row = (document.getElementById('inp1').value);
             column = (document.getElementById('inp2').value);
             index = (document.getElementById('inp3').value);
+            img_type = (document.getElementById('inp4').value);
 
             const image = document.getElementById('source'); // 被修改！！！！！！！！
 
@@ -229,7 +231,7 @@
                 canvasDom.id = 'canvas' + i
                 canvasDom.width = width
                 canvasDom.height = height
-                canvasDom.style.marginRight = '5px'
+                canvasDom.style.marginRight = '2px'
                 canvasDom.onclick = func
                 document.getElementById('allCanvas').appendChild(canvasDom)
                 if (i % Number(column) === 0) {
@@ -249,7 +251,7 @@
             if (allCanvas.length !== 0) {
                 for (let i = 0; i < allCanvas.length; i++) {
                     canvas = document.getElementById(allCanvas[i].id)
-                    downLoad(canvas.toDataURL("image/png"), i);
+                    downLoad(canvas.toDataURL(img_type), i);
                 }
             } else {
                 alert('没拆开的东西咋下载')
@@ -275,7 +277,8 @@
             // base64编码
             // console.log(canvas.toDataURL("image/png"));
             // 设定图片格式
-            downLoad(canvas.toDataURL("image/png"));
+
+            downLoad(canvas.toDataURL(img_type));
         }
         //  下载函数
         function downLoad(url, i) {
